@@ -1,9 +1,9 @@
 // src/app/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { Flame, Calendar, Plus, Trash2, Trophy, Bell, Layers, BarChart3, PieChart, Clock, RotateCcw, Sliders, Check, User, X, Edit3 } from 'lucide-react';
+import { Flame, Calendar, Plus, Trash2, Trophy, Bell, Layers, BarChart3, PieChart, Clock, RotateCcw, Sliders, Check, User, X, Edit3, CheckCircle2, AlertCircle, Circle } from 'lucide-react';
 
 interface Vote {
   tipo_voto: 'NOVO_EU' | 'VELHO_EU';
@@ -12,6 +12,8 @@ interface Vote {
 
 export interface Habit {
   id: string;
+  identity_id?: string;
+  nome_identidade?: string;
   nome_habito: string;
   horarios_notificacao: string[];
   dias_semana: string[];
@@ -149,7 +151,7 @@ export default function Home() {
             if (Array.isArray(hRow.horarios_notificacao)) {
               alertasArray = hRow.horarios_notificacao;
             } else if (typeof hRow.horarios_notificacao === 'string') {
-              alertasArray = hRow.horarios_notificacao.split(',').filter((x: string) => x.trim() !== '');
+              alertasArray = hRow.horarios_notificacao.split(',').map((x: string) => x.trim()).filter(Boolean);
             }
 
             let diasSemanaArray: string[] = TODOS_OS_DIAS;
@@ -165,6 +167,8 @@ export default function Home() {
 
             return {
               id: hRow.id,
+              identity_id: identityRow.id,
+              nome_identidade: identityRow.nome_identidade,
               nome_habito: hRow.nome_habito,
               horarios_notificacao: alertasArray,
               dias_semana: diasSemanaArray,
@@ -195,13 +199,44 @@ export default function Home() {
     }
   }
 
-  // Calcula a eficácia filtrando APENAS pelos hábitos que pertencem àquele dia da semana
+  // LISTA CRONOLÓGICA DE TAREFAS DE HOJE
+  const timelineHoje = useMemo(() => {
+    const todosHabitosHoje: Habit[] = [];
+
+    identities.forEach(ident => {
+      ident.habits.forEach(h => {
+        if (h.dias_semana.includes(diaSemanaHoje)) {
+          todosHabitosHoje.push({
+            ...h,
+            nome_identidade: ident.nome_identidade
+          });
+        }
+      });
+    });
+
+    // Ordenar pelo primeiro horário configurado (ex: "07:00", "07:20", "09:30"...)
+    return todosHabitosHoje.sort((a, b) => {
+      const horaA = a.horarios_notificacao[0] || '99:99';
+      const horaB = b.horarios_notificacao[0] || '99:99';
+      return horaA.localeCompare(horaB);
+    });
+  }, [identities, diaSemanaHoje]);
+
+  const totalConcluidasHoje = useMemo(() => {
+    return timelineHoje.filter(h => {
+      const log = h.historico_dias[dataHoje];
+      if (!log) return false;
+      if (h.e_cumulativo) return log.valor_progresso_dia >= h.meta_objetivo;
+      return log.tipo_voto === 'NOVO_EU';
+    }).length;
+  }, [timelineHoje, dataHoje]);
+
   const calcularEficaciaDia = (habits: Habit[], dateStr: string) => {
     const dataObj = new Date(dateStr + 'T00:00:00');
     const diaCod = DIAS_DA_SEMANA_MAP[dataObj.getDay()];
 
     const habitosDoDia = habits.filter(h => h.dias_semana.includes(diaCod));
-    if (habitosDoDia.length === 0) return 100; // Dia sem compromissos é 100% neutro
+    if (habitosDoDia.length === 0) return 100;
 
     let somaPercentagens = 0;
 
@@ -511,22 +546,130 @@ export default function Home() {
         </div>
       </div>
 
-      {/* PAINEL GRID */}
+      {/* PAINEL GRID PRINCIPAL */}
       <div className="w-full max-w-4xl px-3 md:px-0 pt-4 md:pt-0 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
         
-        {/* SEPARADOR 1: PAINEL DE HÁBITOS */}
+        {/* ================= SEPARADOR 1: PAINEL DE HÁBITOS ================= */}
         <div className={`${tabMobileAtiva === 'painel' ? 'block' : 'hidden md:block'} space-y-6 md:col-span-2`}>
-          {identities.length === 0 && (
-            <div className="bg-[#0d0d0d] border border-[#3c3c3c] rounded-none p-6 text-center text-[#bbbbbb] text-base font-light">
-              NENHUMA ÁREA ATIVA DA IDENTIDADE DISPONÍVEL.
+          
+          {/* ⚡ NOVO BLOCO: TIMELINE OPERACIONAL / TAREFAS DE HOJE ⚡ */}
+          <div className="bg-[#0d0d0d] border border-[#ffffff]/30 rounded-none p-5 space-y-4">
+            <div className="flex justify-between items-center border-b border-[#3c3c3c] pb-3">
+              <div>
+                <span className="text-xs uppercase font-black text-[#0066b1] tracking-[1.5px] block mb-0.5">CRONOGRAMA ATIVO</span>
+                <h3 className="text-xl font-black text-[#ffffff] uppercase tracking-tight flex items-center gap-2">
+                  <Clock size={18} className="text-[#0066b1]" /> MISSÕES DE HOJE ({diaSemanaHoje.toUpperCase()})
+                </h3>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] font-bold text-[#7e7e7e] uppercase tracking-[1.5px] block">CUMPRIMENTO</span>
+                <span className="text-sm font-mono font-black text-[#ffffff]">
+                  {totalConcluidasHoje} / {timelineHoje.length} ({timelineHoje.length > 0 ? Math.round((totalConcluidasHoje / timelineHoje.length) * 100) : 0}%)
+                </span>
+              </div>
             </div>
-          )}
 
+            {timelineHoje.length === 0 ? (
+              <div className="p-4 text-center font-mono text-xs text-[#7e7e7e] bg-[#1a1a1a]">
+                NENHUMA MISSÃO AGENDADA PARA HOJE
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {timelineHoje.map((habit) => {
+                  const registo = habit.historico_dias[dataHoje];
+                  const horarioExibicao = habit.horarios_notificacao.length > 0 ? habit.horarios_notificacao[0] : '--:--';
+                  const dosePorHora = Math.round(habit.meta_objetivo / 15) || 1;
+                  const valorAtual = registo ? registo.valor_progresso_dia : 0;
+                  const isConcluido = habit.e_cumulativo 
+                    ? valorAtual >= habit.meta_objetivo 
+                    : registo?.tipo_voto === 'NOVO_EU';
+                  const isFalha = !habit.e_cumulativo && registo?.tipo_voto === 'VELHO_EU';
+
+                  return (
+                    <div 
+                      key={habit.id} 
+                      className={`p-3 border flex flex-col gap-2.5 transition rounded-none ${
+                        isConcluido 
+                          ? 'bg-[#141414] border-[#ffffff]/40' 
+                          : isFalha 
+                          ? 'bg-[#1a0f0f] border-[#e22718]/60' 
+                          : 'bg-[#1a1a1a] border-[#3c3c3c]'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono text-xs font-black px-2 py-1 bg-[#0d0d0d] border border-[#3c3c3c] text-[#ffffff]">
+                            {horarioExibicao}
+                          </span>
+                          <div>
+                            <span className="text-[9px] text-[#7e7e7e] uppercase font-bold tracking-wider block">
+                              {habit.nome_identidade}
+                            </span>
+                            <span className={`text-sm font-bold uppercase tracking-tight ${isConcluido ? 'text-[#ffffff] line-through decoration-[#7e7e7e]' : 'text-[#ffffff]'}`}>
+                              {habit.nome_habito}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          {isConcluido && (
+                            <span className="text-[10px] font-mono font-bold bg-[#ffffff] text-[#000000] px-2 py-0.5 uppercase">
+                              NOVO EU ✓
+                            </span>
+                          )}
+                          {isFalha && (
+                            <span className="text-[10px] font-mono font-bold bg-[#e22718] text-[#ffffff] px-2 py-0.5 uppercase">
+                              VELHO EU ✕
+                            </span>
+                          )}
+                          {!isConcluido && !isFalha && (
+                            <span className="text-[10px] font-mono text-[#7e7e7e] px-2 py-0.5 uppercase border border-[#3c3c3c]">
+                              PENDENTE
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Controlos Rápidos Diretos na Timeline */}
+                      {habit.e_cumulativo ? (
+                        <div className="flex items-center justify-between gap-3 bg-[#0d0d0d] p-2 border border-[#3c3c3c]">
+                          <span className="text-xs font-mono text-[#bbbbbb]">
+                            {valorAtual} / {habit.meta_objetivo} {habit.unidade_medida}
+                          </span>
+                          <div className="flex gap-1.5">
+                            <button onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtual, -dosePorHora)} className="px-2.5 py-1 bg-[#1a1a1a] border border-[#3c3c3c] text-xs font-mono font-black active:bg-[#262626]">-</button>
+                            <button onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtual, dosePorHora)} className={`px-2.5 py-1 text-xs font-mono font-black uppercase ${isConcluido ? 'bg-[#ffffff] text-[#000000]' : 'bg-[#e22718] text-[#ffffff]'}`}>
+                              +{dosePorHora}{habit.unidade_medida}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                          <button 
+                            onClick={() => handleToggleVoto(habit.id, 'NOVO_EU')}
+                            className={`text-[10px] py-1.5 font-bold uppercase tracking-wider border transition ${registo?.tipo_voto === 'NOVO_EU' ? 'bg-[#ffffff] text-[#000000] border-[#ffffff]' : 'bg-transparent text-[#ffffff] border-[#3c3c3c] active:bg-[#262626]'}`}
+                          >
+                            👍 NOVO EU
+                          </button>
+                          <button 
+                            onClick={() => handleToggleVoto(habit.id, 'VELHO_EU')}
+                            className={`text-[10px] py-1.5 font-bold uppercase tracking-wider border transition ${registo?.tipo_voto === 'VELHO_EU' ? 'bg-[#e22718] text-[#ffffff] border-[#e22718]' : 'bg-transparent text-[#e22718] border-[#3c3c3c] active:bg-[#262626]'}`}
+                          >
+                            👎 VELHO EU
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* LISTA POR FACETAS / IDENTIDADES */}
           {identities.map((faceta) => {
             const pctCristalizacao = calcularCristalizacaoJusta(faceta.habits);
             const eficHoje = calcularEficaciaDia(faceta.habits, dataHoje);
-
-            // Filtra os hábitos ativos apenas para o dia da semana atual no Painel
             const habitosDeHoje = faceta.habits.filter(h => h.dias_semana.includes(diaSemanaHoje));
 
             return (
@@ -546,66 +689,66 @@ export default function Home() {
                   <div className="bg-[#ffffff] h-full transition-all duration-500" style={{ width: `${pctCristalizacao}%` }} />
                 </div>
                 <div className="text-xs text-[#bbbbbb] flex justify-between font-mono tracking-wider">
-                  <span>HOJE ({diaSemanaHoje.toUpperCase()}): {habitosDeHoje.length} HÁBITOS PROGRAMADOS</span>
-                  <span>EFICÁCIA: <b className="text-[#ffffff] text-sm">{eficHoje}%</b></span>
+                  <span>CICLO M-ENGINEERING</span>
+                  <span>EFICÁCIA HOJE: <b className="text-[#ffffff] text-sm">{eficHoje}%</b></span>
                 </div>
 
                 <div className="space-y-4 pt-1">
-                  {habitosDeHoje.length === 0 ? (
-                    <div className="p-3 text-center font-mono text-xs text-[#7e7e7e] bg-[#1a1a1a] border border-[#3c3c3c]">
-                      SEM HÁBITOS AGENDADOS PARA HOJE
-                    </div>
-                  ) : (
-                    habitosDeHoje.map((habit) => {
-                      const registoHoje = habit.historico_dias[dataHoje];
-                      const dosePorHora = Math.round(habit.meta_objetivo / 15) || 1;
-                      const valorAtualCumulativo = registoHoje ? registoHoje.valor_progresso_dia : 0;
-                      const concluidoCumulativo = valorAtualCumulativo >= habit.meta_objetivo;
+                  {faceta.habits.map((habit) => {
+                    const agendadoParaHoje = habit.dias_semana.includes(diaSemanaHoje);
+                    const registoHoje = habit.historico_dias[dataHoje];
+                    const dosePorHora = Math.round(habit.meta_objetivo / 15) || 1;
+                    const valorAtualCumulativo = registoHoje ? registoHoje.valor_progresso_dia : 0;
+                    const concluidoCumulativo = valorAtualCumulativo >= habit.meta_objetivo;
 
-                      return (
-                        <div key={habit.id} className="bg-[#1a1a1a] p-4 rounded-none border border-[#3c3c3c] space-y-3.5">
-                          <div className="flex justify-between items-center">
-                            <div>
+                    return (
+                      <div key={habit.id} className={`p-4 rounded-none border space-y-3.5 ${agendadoParaHoje ? 'bg-[#1a1a1a] border-[#3c3c3c]' : 'bg-[#121212] border-[#262626] opacity-60'}`}>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <div className="flex items-center gap-2">
                               <h4 className="font-bold text-base text-[#ffffff] tracking-tight uppercase">{habit.nome_habito}</h4>
-                              <span className="text-xs text-[#bbbbbb] font-mono mt-1.5 flex items-center gap-1.5">
-                                <Bell size={13} className="text-[#e22718]" /> 
-                                {habit.horarios_notificacao.length > 0 ? habit.horarios_notificacao.join(' | ') : 'SEM ALERTA'}
-                              </span>
+                              {!agendadoParaHoje && (
+                                <span className="text-[9px] font-mono bg-[#262626] text-[#7e7e7e] px-1.5 py-0.5 uppercase">FORA DE HOJE</span>
+                              )}
+                            </div>
+                            <span className="text-xs text-[#bbbbbb] font-mono mt-1.5 flex items-center gap-1.5">
+                              <Bell size={13} className="text-[#e22718]" /> 
+                              {habit.horarios_notificacao.length > 0 ? habit.horarios_notificacao.join(' | ') : 'SEM ALERTA'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {habit.e_cumulativo ? (
+                          <div className="flex items-center justify-between gap-4 bg-[#0d0d0d] p-3 rounded-none border border-[#3c3c3c]">
+                            <div className="text-sm font-mono text-[#bbbbbb]">
+                              M-METRIC: <span className="font-black text-[#ffffff] text-base">{valorAtualCumulativo}</span> / {habit.meta_objetivo} {habit.unidade_medida}
+                            </div>
+                            <div className="flex gap-2">
+                              <button onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtualCumulativo, -dosePorHora)} className="px-4 py-2 bg-[#1a1a1a] border border-[#3c3c3c] rounded-none font-black text-base active:bg-[#262626]">-</button>
+                              <button onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtualCumulativo, dosePorHora)} className={`px-4 py-2 rounded-none text-xs tracking-[1.5px] uppercase font-black transition ${concluidoCumulativo ? 'bg-[#ffffff] text-[#000000]' : 'bg-[#e22718] text-[#ffffff]'}`}>
+                                +{dosePorHora}{habit.unidade_medida}
+                              </button>
                             </div>
                           </div>
-
-                          {habit.e_cumulativo ? (
-                            <div className="flex items-center justify-between gap-4 bg-[#0d0d0d] p-3 rounded-none border border-[#3c3c3c]">
-                              <div className="text-sm font-mono text-[#bbbbbb]">
-                                M-METRIC: <span className="font-black text-[#ffffff] text-base">{valorAtualCumulativo}</span> / {habit.meta_objetivo} {habit.unidade_medida}
-                              </div>
-                              <div className="flex gap-2">
-                                <button onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtualCumulativo, -dosePorHora)} className="px-4 py-2 bg-[#1a1a1a] border border-[#3c3c3c] rounded-none font-black text-base active:bg-[#262626]">-</button>
-                                <button onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtualCumulativo, dosePorHora)} className={`px-4 py-2 rounded-none text-xs tracking-[1.5px] uppercase font-black transition ${concluidoCumulativo ? 'bg-[#ffffff] text-[#000000]' : 'bg-[#e22718] text-[#ffffff]'}`}>
-                                  +{dosePorHora}{habit.unidade_medida}
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-2 gap-3">
-                              <button 
-                                onClick={() => handleToggleVoto(habit.id, 'NOVO_EU')}
-                                className={`text-xs py-3 rounded-none tracking-[1.5px] uppercase transition border font-black flex items-center justify-center gap-1 ${registoHoje?.tipo_voto === 'NOVO_EU' ? 'bg-[#ffffff] text-[#000000] border-[#ffffff]' : 'bg-transparent text-[#ffffff] border-[#3c3c3c] active:bg-[#262626]'}`}
-                              >
-                                👍 NOVO EU {registoHoje?.tipo_voto === 'NOVO_EU' && '✓'}
-                              </button>
-                              <button 
-                                onClick={() => handleToggleVoto(habit.id, 'VELHO_EU')}
-                                className={`text-xs py-3 rounded-none tracking-[1.5px] uppercase transition border font-black flex items-center justify-center gap-1 ${registoHoje?.tipo_voto === 'VELHO_EU' ? 'bg-[#e22718] text-[#ffffff] border-[#e22718]' : 'bg-transparent text-[#e22718] border-[#3c3c3c] active:bg-[#262626]'}`}
-                              >
-                                👎 VELHO EU {registoHoje?.tipo_voto === 'VELHO_EU' && '✓'}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
+                        ) : (
+                          <div className="grid grid-cols-2 gap-3">
+                            <button 
+                              onClick={() => handleToggleVoto(habit.id, 'NOVO_EU')}
+                              className={`text-xs py-3 rounded-none tracking-[1.5px] uppercase transition border font-black flex items-center justify-center gap-1 ${registoHoje?.tipo_voto === 'NOVO_EU' ? 'bg-[#ffffff] text-[#000000] border-[#ffffff]' : 'bg-transparent text-[#ffffff] border-[#3c3c3c] active:bg-[#262626]'}`}
+                            >
+                              👍 NOVO EU {registoHoje?.tipo_voto === 'NOVO_EU' && '✓'}
+                            </button>
+                            <button 
+                              onClick={() => handleToggleVoto(habit.id, 'VELHO_EU')}
+                              className={`text-xs py-3 rounded-none tracking-[1.5px] uppercase transition border font-black flex items-center justify-center gap-1 ${registoHoje?.tipo_voto === 'VELHO_EU' ? 'bg-[#e22718] text-[#ffffff] border-[#e22718]' : 'bg-transparent text-[#e22718] border-[#3c3c3c] active:bg-[#262626]'}`}
+                            >
+                              👎 VELHO EU {registoHoje?.tipo_voto === 'VELHO_EU' && '✓'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -710,7 +853,6 @@ export default function Home() {
                   <input type="text" placeholder="NOME DO HÁBITO" value={novoHabitoNome} onChange={(e) => setNovoHabitoNome(e.target.value)} className="w-full bg-[#1a1a1a] border border-[#3c3c3c] rounded-none p-2.5 text-sm text-[#ffffff] focus:outline-none focus:border-[#ffffff] font-mono" />
                 </div>
 
-                {/* SELETOR DE DIAS DA SEMANA */}
                 <div className="bg-[#1a1a1a] p-3 border border-[#3c3c3c] rounded-none space-y-2">
                   <label className="text-[10px] font-black text-[#7e7e7e] tracking-[1.5px] uppercase block">DIAS DE EXECUÇÃO</label>
                   <div className="flex justify-between gap-1">
@@ -807,7 +949,6 @@ export default function Home() {
               <input type="text" value={editNome} onChange={(e) => setEditNome(e.target.value)} className="w-full bg-[#1a1a1a] border border-[#3c3c3c] rounded-none p-2.5 text-sm text-[#ffffff] font-mono focus:outline-none focus:border-blue-500" />
             </div>
 
-            {/* EDIÇÃO DOS DIAS DA SEMANA */}
             <div className="bg-[#1a1a1a] p-3 border border-[#3c3c3c] rounded-none space-y-2">
               <label className="text-[10px] font-bold text-[#7e7e7e] uppercase tracking-wider block">DIAS DE EXECUÇÃO</label>
               <div className="flex justify-between gap-1">
