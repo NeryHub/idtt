@@ -12,8 +12,29 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* 1. Bloquear o efeito de mola / overscroll bounce preto no iOS */
+html,
 body {
-  background-color: #030712;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+  background-color: #030712 !important;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* 2. Ocultar todas as barras de scroll (iOS Safari, Chrome, Firefox) mantendo o scroll funcional */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+}
+
+body {
   background-image: 
     radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.22) 0px, transparent 45%),
     radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.2) 0px, transparent 45%),
@@ -23,9 +44,10 @@ body {
   background-attachment: fixed;
   color: #f8fafc;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Apple Liquid Glass Engine */
@@ -50,12 +72,4 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.liquid-glass-pill {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
 }

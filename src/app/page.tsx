@@ -466,7 +466,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen pb-28 md:pb-12 md:p-6 lg:p-8 flex flex-col items-center w-full select-none overflow-x-hidden">
+    <main className="min-h-screen pb-32 md:pb-12 md:p-6 lg:p-8 flex flex-col items-center w-full select-none">
       
       {/* 🔮 APPLE LIQUID GLASS NAVBAR */}
       <header className="w-full max-w-4xl liquid-glass-panel sticky top-2 sm:top-3 z-40 p-3 sm:p-4 rounded-2xl sm:rounded-3xl mb-3 sm:mb-5 flex justify-between items-center mx-auto shadow-2xl">
