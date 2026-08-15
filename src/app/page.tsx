@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { Flame, Calendar, Plus, Trash2, Trophy, Bell, Layers, BarChart3, PieChart, Clock, RotateCcw, Sliders, Check, User, X, Edit3, CheckCircle2, AlertCircle, Circle } from 'lucide-react';
+import { Flame, Calendar as CalendarIcon, Plus, Trash2, Trophy, Bell, Layers, BarChart3, PieChart, Clock, RotateCcw, Sliders, Check, User, X, Edit3, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Vote {
   tipo_voto: 'NOVO_EU' | 'VELHO_EU';
@@ -40,6 +40,16 @@ const DIAS_DA_SEMANA_MAP: { [key: number]: string } = {
   6: 'sab'
 };
 
+const NOMES_DIAS_EXTENSO: { [key: string]: string } = {
+  dom: 'DOMINGO',
+  seg: 'SEGUNDA-FEIRA',
+  ter: 'TERÇA-FEIRA',
+  qua: 'QUARTA-FEIRA',
+  qui: 'QUINTA-FEIRA',
+  sex: 'SEXTA-FEIRA',
+  sab: 'SÁBADO'
+};
+
 const TODOS_OS_DIAS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
 
 export default function Home() {
@@ -47,6 +57,10 @@ export default function Home() {
   const [identities, setIdentities] = useState<Identity[]>([]);
   const [novaFacetaNome, setNovaFacetaNome] = useState('');
   
+  // Controlo de Data Selecionada
+  const dataHojeReal = new Date().toISOString().split('T')[0];
+  const [dataSelecionada, setDataSelecionada] = useState<string>(dataHojeReal);
+
   // Estados para criação manual de hábitos
   const [idFacetaAtivaParaHabito, setIdFacetaAtivaParaHabito] = useState<string | null>(null);
   const [novoHabitoNome, setNovoHabitoNome] = useState('');
@@ -81,9 +95,16 @@ export default function Home() {
   // Modais de confirmação
   const [modalConfirm, setModalConfirm] = useState<{ tipo: 'area' | 'habito'; id: string; nome: string } | null>(null);
 
-  const hojeObj = new Date();
-  const dataHoje = hojeObj.toISOString().split('T')[0];
-  const diaSemanaHoje = DIAS_DA_SEMANA_MAP[hojeObj.getDay()];
+  // Cálculo do dia da semana baseado na DATA SELECIONADA
+  const dataSelecionadaObj = useMemo(() => {
+    return new Date(dataSelecionada + 'T00:00:00');
+  }, [dataSelecionada]);
+
+  const diaSemanaSelecionado = useMemo(() => {
+    return DIAS_DA_SEMANA_MAP[dataSelecionadaObj.getDay()];
+  }, [dataSelecionadaObj]);
+
+  const isHoje = dataSelecionada === dataHojeReal;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -199,14 +220,21 @@ export default function Home() {
     }
   }
 
-  // LISTA CRONOLÓGICA DE TAREFAS DE HOJE
-  const timelineHoje = useMemo(() => {
-    const todosHabitosHoje: Habit[] = [];
+  // Navegar dias
+  const mudarDia = (diasDelta: number) => {
+    const novaData = new Date(dataSelecionadaObj);
+    novaData.setDate(novaData.getDate() + diasDelta);
+    setDataSelecionada(novaData.toISOString().split('T')[0]);
+  };
+
+  // TIMELINE PARA O DIA SELECIONADO
+  const timelineDiaSelecionado = useMemo(() => {
+    const todosHabitosDoDia: Habit[] = [];
 
     identities.forEach(ident => {
       ident.habits.forEach(h => {
-        if (h.dias_semana.includes(diaSemanaHoje)) {
-          todosHabitosHoje.push({
+        if (h.dias_semana.includes(diaSemanaSelecionado)) {
+          todosHabitosDoDia.push({
             ...h,
             nome_identidade: ident.nome_identidade
           });
@@ -214,22 +242,21 @@ export default function Home() {
       });
     });
 
-    // Ordenar pelo primeiro horário configurado (ex: "07:00", "07:20", "09:30"...)
-    return todosHabitosHoje.sort((a, b) => {
+    return todosHabitosDoDia.sort((a, b) => {
       const horaA = a.horarios_notificacao[0] || '99:99';
       const horaB = b.horarios_notificacao[0] || '99:99';
       return horaA.localeCompare(horaB);
     });
-  }, [identities, diaSemanaHoje]);
+  }, [identities, diaSemanaSelecionado]);
 
-  const totalConcluidasHoje = useMemo(() => {
-    return timelineHoje.filter(h => {
-      const log = h.historico_dias[dataHoje];
+  const totalConcluidasDia = useMemo(() => {
+    return timelineDiaSelecionado.filter(h => {
+      const log = h.historico_dias[dataSelecionada];
       if (!log) return false;
       if (h.e_cumulativo) return log.valor_progresso_dia >= h.meta_objetivo;
       return log.tipo_voto === 'NOVO_EU';
     }).length;
-  }, [timelineHoje, dataHoje]);
+  }, [timelineDiaSelecionado, dataSelecionada]);
 
   const calcularEficaciaDia = (habits: Habit[], dateStr: string) => {
     const dataObj = new Date(dateStr + 'T00:00:00');
@@ -440,14 +467,14 @@ export default function Home() {
       if (h) { habitoAlvo = h; break; }
     }
     if (!habitoAlvo) return;
-    const votoAtual = habitoAlvo.historico_dias[dataHoje];
+    const votoAtual = habitoAlvo.historico_dias[dataSelecionada];
 
     if (votoAtual?.tipo_voto === tipoAlvo) {
-      await supabase.from('votes_log').delete().eq('habit_id', habitId).eq('data_voto', dataHoje);
+      await supabase.from('votes_log').delete().eq('habit_id', habitId).eq('data_voto', dataSelecionada);
     } else {
       await supabase.from('votes_log').upsert({
         habit_id: habitId,
-        data_voto: dataHoje,
+        data_voto: dataSelecionada,
         tipo_voto: tipoAlvo,
         valor_progresso_dia: habitoAlvo.meta_objetivo
       }, { onConflict: 'habit_id,data_voto' });
@@ -461,7 +488,7 @@ export default function Home() {
     const novoValor = Math.max(0, valorAtual + incremento);
     await supabase.from('votes_log').upsert({
       habit_id: habitId,
-      data_voto: dataHoje,
+      data_voto: dataSelecionada,
       tipo_voto: novoValor >= h.meta_objetivo ? 'NOVO_EU' : 'VELHO_EU',
       valor_progresso_dia: novoValor
     }, { onConflict: 'habit_id,data_voto' });
@@ -525,7 +552,7 @@ export default function Home() {
       `}} />
       
       {/* HEADER M-MOTORSPORT */}
-      <div className="w-full max-w-4xl flex justify-between items-center bg-[#0d0d0d] sticky top-0 z-40 p-4 border-b border-[#3c3c3c] md:rounded-none md:mb-6">
+      <div className="w-full max-w-4xl flex justify-between items-center bg-[#0d0d0d] sticky top-0 z-40 p-4 border-b border-[#3c3c3c] md:rounded-none md:mb-4">
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-0.5">
             <span className="font-mono font-black text-2xl tracking-wider text-[#ffffff] uppercase">IDTT</span>
@@ -546,37 +573,90 @@ export default function Home() {
         </div>
       </div>
 
+      {/* 🧭 SELETOR DE DATA / NAVEGADOR DE DIAS (STICKY SUB-HEADER) */}
+      <div className="w-full max-w-4xl px-3 md:px-0 mb-4">
+        <div className="bg-[#0d0d0d] border border-[#3c3c3c] p-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center justify-between md:justify-start gap-2">
+            <button 
+              onClick={() => mudarDia(-1)} 
+              className="p-2 bg-[#1a1a1a] border border-[#3c3c3c] text-[#ffffff] hover:bg-[#262626] transition"
+              title="Dia Anterior"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <div className="flex items-center gap-2">
+              <input 
+                type="date" 
+                value={dataSelecionada} 
+                onChange={(e) => setDataSelecionada(e.target.value)} 
+                className="bg-[#1a1a1a] border border-[#3c3c3c] text-xs font-mono text-[#ffffff] px-2.5 py-1.5 focus:outline-none"
+              />
+              <button 
+                onClick={() => setDataSelecionada(dataHojeReal)}
+                className={`text-[10px] font-mono font-bold tracking-wider px-2.5 py-1.5 border uppercase transition ${
+                  isHoje 
+                    ? 'bg-[#ffffff] text-[#000000] border-[#ffffff]' 
+                    : 'bg-transparent text-[#7e7e7e] border-[#3c3c3c] hover:text-[#ffffff]'
+                }`}
+              >
+                HOJE
+              </button>
+            </div>
+
+            <button 
+              onClick={() => mudarDia(1)} 
+              className="p-2 bg-[#1a1a1a] border border-[#3c3c3c] text-[#ffffff] hover:bg-[#262626] transition"
+              title="Dia Seguinte"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between md:justify-end gap-3 text-right">
+            <div className="text-left md:text-right">
+              <span className="text-[10px] font-black text-[#0066b1] tracking-[1.5px] uppercase block">
+                {NOMES_DIAS_EXTENSO[diaSemanaSelecionado]}
+              </span>
+              <span className="text-xs font-mono text-[#bbbbbb]">
+                {dataSelecionada} {!isHoje && <b className="text-[#e22718]">(HISTÓRICO)</b>}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* PAINEL GRID PRINCIPAL */}
-      <div className="w-full max-w-4xl px-3 md:px-0 pt-4 md:pt-0 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      <div className="w-full max-w-4xl px-3 md:px-0 pt-1 md:pt-0 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
         
         {/* ================= SEPARADOR 1: PAINEL DE HÁBITOS ================= */}
         <div className={`${tabMobileAtiva === 'painel' ? 'block' : 'hidden md:block'} space-y-6 md:col-span-2`}>
           
-          {/* ⚡ NOVO BLOCO: TIMELINE OPERACIONAL / TAREFAS DE HOJE ⚡ */}
+          {/* ⚡ TIMELINE OPERACIONAL / TAREFAS DO DIA SELECIONADO ⚡ */}
           <div className="bg-[#0d0d0d] border border-[#ffffff]/30 rounded-none p-5 space-y-4">
             <div className="flex justify-between items-center border-b border-[#3c3c3c] pb-3">
               <div>
-                <span className="text-xs uppercase font-black text-[#0066b1] tracking-[1.5px] block mb-0.5">CRONOGRAMA ATIVO</span>
+                <span className="text-xs uppercase font-black text-[#0066b1] tracking-[1.5px] block mb-0.5">TIMELINE OPERACIONAL</span>
                 <h3 className="text-xl font-black text-[#ffffff] uppercase tracking-tight flex items-center gap-2">
-                  <Clock size={18} className="text-[#0066b1]" /> MISSÕES DE HOJE ({diaSemanaHoje.toUpperCase()})
+                  <Clock size={18} className="text-[#0066b1]" /> MISSÕES: {NOMES_DIAS_EXTENSO[diaSemanaSelecionado]}
                 </h3>
               </div>
               <div className="text-right">
-                <span className="text-[10px] font-bold text-[#7e7e7e] uppercase tracking-[1.5px] block">CUMPRIMENTO</span>
+                <span className="text-[10px] font-bold text-[#7e7e7e] uppercase tracking-[1.5px] block">PROGRESSO</span>
                 <span className="text-sm font-mono font-black text-[#ffffff]">
-                  {totalConcluidasHoje} / {timelineHoje.length} ({timelineHoje.length > 0 ? Math.round((totalConcluidasHoje / timelineHoje.length) * 100) : 0}%)
+                  {totalConcluidasDia} / {timelineDiaSelecionado.length} ({timelineDiaSelecionado.length > 0 ? Math.round((totalConcluidasDia / timelineDiaSelecionado.length) * 100) : 0}%)
                 </span>
               </div>
             </div>
 
-            {timelineHoje.length === 0 ? (
+            {timelineDiaSelecionado.length === 0 ? (
               <div className="p-4 text-center font-mono text-xs text-[#7e7e7e] bg-[#1a1a1a]">
-                NENHUMA MISSÃO AGENDADA PARA HOJE
+                NENHUMA MISSÃO AGENDADA PARA ESTE DIA
               </div>
             ) : (
               <div className="space-y-2.5">
-                {timelineHoje.map((habit) => {
-                  const registo = habit.historico_dias[dataHoje];
+                {timelineDiaSelecionado.map((habit) => {
+                  const registo = habit.historico_dias[dataSelecionada];
                   const horarioExibicao = habit.horarios_notificacao.length > 0 ? habit.horarios_notificacao[0] : '--:--';
                   const dosePorHora = Math.round(habit.meta_objetivo / 15) || 1;
                   const valorAtual = registo ? registo.valor_progresso_dia : 0;
@@ -669,8 +749,7 @@ export default function Home() {
           {/* LISTA POR FACETAS / IDENTIDADES */}
           {identities.map((faceta) => {
             const pctCristalizacao = calcularCristalizacaoJusta(faceta.habits);
-            const eficHoje = calcularEficaciaDia(faceta.habits, dataHoje);
-            const habitosDeHoje = faceta.habits.filter(h => h.dias_semana.includes(diaSemanaHoje));
+            const eficDia = calcularEficaciaDia(faceta.habits, dataSelecionada);
 
             return (
               <div key={faceta.id} className="bg-[#0d0d0d] border border-[#3c3c3c] rounded-none p-5 shadow-none space-y-4">
@@ -690,24 +769,24 @@ export default function Home() {
                 </div>
                 <div className="text-xs text-[#bbbbbb] flex justify-between font-mono tracking-wider">
                   <span>CICLO M-ENGINEERING</span>
-                  <span>EFICÁCIA HOJE: <b className="text-[#ffffff] text-sm">{eficHoje}%</b></span>
+                  <span>EFICÁCIA NO DIA: <b className="text-[#ffffff] text-sm">{eficDia}%</b></span>
                 </div>
 
                 <div className="space-y-4 pt-1">
                   {faceta.habits.map((habit) => {
-                    const agendadoParaHoje = habit.dias_semana.includes(diaSemanaHoje);
-                    const registoHoje = habit.historico_dias[dataHoje];
+                    const agendadoParaDia = habit.dias_semana.includes(diaSemanaSelecionado);
+                    const registoHoje = habit.historico_dias[dataSelecionada];
                     const dosePorHora = Math.round(habit.meta_objetivo / 15) || 1;
                     const valorAtualCumulativo = registoHoje ? registoHoje.valor_progresso_dia : 0;
                     const concluidoCumulativo = valorAtualCumulativo >= habit.meta_objetivo;
 
                     return (
-                      <div key={habit.id} className={`p-4 rounded-none border space-y-3.5 ${agendadoParaHoje ? 'bg-[#1a1a1a] border-[#3c3c3c]' : 'bg-[#121212] border-[#262626] opacity-60'}`}>
+                      <div key={habit.id} className={`p-4 rounded-none border space-y-3.5 ${agendadoParaDia ? 'bg-[#1a1a1a] border-[#3c3c3c]' : 'bg-[#121212] border-[#262626] opacity-60'}`}>
                         <div className="flex justify-between items-center">
                           <div>
                             <div className="flex items-center gap-2">
                               <h4 className="font-bold text-base text-[#ffffff] tracking-tight uppercase">{habit.nome_habito}</h4>
-                              {!agendadoParaHoje && (
+                              {!agendadoParaDia && (
                                 <span className="text-[9px] font-mono bg-[#262626] text-[#7e7e7e] px-1.5 py-0.5 uppercase">FORA DE HOJE</span>
                               )}
                             </div>
@@ -761,7 +840,7 @@ export default function Home() {
           {/* SEPARADOR 2: MÉTRICAS E CALENDÁRIO */}
           <div className={`${tabMobileAtiva === 'metricas' ? 'block' : 'hidden md:block'} space-y-6`}>
             <div className="bg-[#0d0d0d] border border-[#3c3c3c] p-4 rounded-none space-y-3 shadow-none">
-              <h3 className="text-xs font-bold tracking-[1.5px] text-[#7e7e7e] uppercase flex items-center gap-1.5"><Calendar size={14} /> CALENDÁRIO COMBINADO (META: 70%):</h3>
+              <h3 className="text-xs font-bold tracking-[1.5px] text-[#7e7e7e] uppercase flex items-center gap-1.5"><CalendarIcon size={14} /> CALENDÁRIO COMBINADO (META: 70%):</h3>
               <div className="grid grid-cols-7 gap-2 max-w-xs mx-auto">
                 {gerarDiasCalendario().map((dia, idx) => {
                   const dateStr = dia.toISOString().split('T')[0];
@@ -773,9 +852,24 @@ export default function Home() {
                   const temAlgumRegisto = identities.some(f => f.habits.some(h => h.historico_dias[dateStr] !== undefined));
                   const diaVerde = temAlgumRegisto && mediaEficaciaGlobalDia >= 70;
                   const diaVermelho = temAlgumRegisto && mediaEficaciaGlobalDia < 70;
+                  const isDiaSelecionadoNoGrid = dateStr === dataSelecionada;
 
                   return (
-                    <div key={idx} className={`aspect-square border flex items-center justify-center text-xs font-mono font-bold rounded-none ${diaVerde ? 'bg-transparent border-[#ffffff] text-[#ffffff]' : diaVermelho ? 'bg-transparent border-[#e22718] text-[#e22718]' : 'bg-[#1F2942]/10 border-[#3c3c3c] text-[#7e7e7e]'}`}>{dia.getDate()}</div>
+                    <button 
+                      key={idx} 
+                      onClick={() => setDataSelecionada(dateStr)}
+                      className={`aspect-square border flex items-center justify-center text-xs font-mono font-bold rounded-none transition ${
+                        isDiaSelecionadoNoGrid ? 'ring-2 ring-[#0066b1]' : ''
+                      } ${
+                        diaVerde 
+                          ? 'bg-transparent border-[#ffffff] text-[#ffffff]' 
+                          : diaVermelho 
+                          ? 'bg-transparent border-[#e22718] text-[#e22718]' 
+                          : 'bg-[#1F2942]/10 border-[#3c3c3c] text-[#7e7e7e]'
+                      }`}
+                    >
+                      {dia.getDate()}
+                    </button>
                   );
                 })}
               </div>
@@ -957,7 +1051,7 @@ export default function Home() {
                     key={d}
                     type="button"
                     onClick={() => toggleDiaEdicao(d)}
-                    className={`flex-1 py-1 text-xs font-mono font-bold uppercase transition rounded-none ${editDias.includes(d) ? 'bg-[#ffffff] text-[#000000]' : 'bg-[#0d0d0d] text-[#7e7e7e] border border-[#3c3c3c]'}`}
+                    className={`flex-1 py-1 text-xs font-mono font-bold uppercase transition rounded-none ${editDias.includes(d) ? 'bg-[#ffffff] text-[#000000]' : 'bg-[#0d0d0d] text-[#7e7e7e]'}`}
                   >
                     {d}
                   </button>
