@@ -12,7 +12,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Metadados estendidos para a Play Store e ecrã inteiro nativo
 export const metadata: Metadata = {
   title: 'IDTT',
   description: 'Consistência e Identidade Expandida',
@@ -22,15 +21,18 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'IDTT',
   },
+  icons: {
+    apple: '/icon-192.png',
+  },
 };
 
-// Viewport mobile para trancar zoom e aplicar cor Outer Space de fundo
 export const viewport: Viewport = {
-  themeColor: '#1F2942',
+  themeColor: '#030712',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -41,10 +43,10 @@ export default function RootLayout({
   return (
     <html
       lang="pt"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-[#1F2942]`}
-      suppressHydrationWarning={true} // <-- Esta linha ignora as interferências das extensões do browser
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning={true}
     >
-      <body className="min-h-full flex flex-col bg-[#1F2942] text-white">
+      <body className="min-h-full flex flex-col text-slate-100 selection:bg-amber-500/30">
         {children}
       </body>
     </html>

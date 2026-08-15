@@ -1,14 +1,14 @@
 {
-  "background_color": "#ffffff",
+  "name": "IDTT",
+  "short_name": "IDTT",
   "description": "Consistência e Identidade Expandida",
   "dir": "ltr",
   "display": "standalone",
-  "name": "IDTT",
-  "orientation": "any",
+  "orientation": "portrait",
   "scope": "/",
-  "short_name": "IDTT",
   "start_url": "/",
-  "theme_color": "#1F2942",
+  "background_color": "#030712",
+  "theme_color": "#030712",
   "icons": [
     {
       "src": "/icon-192.png",
