@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { Flame, Calendar as CalendarIcon, Plus, Trash2, Trophy, Bell, Layers, BarChart3, PieChart, Clock, RotateCcw, Sliders, Check, User, X, Edit3, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Flame, Calendar as CalendarIcon, Plus, Trash2, Trophy, Bell, Layers, BarChart3, PieChart, Clock, RotateCcw, Sliders, Check, User, X, Edit3, ChevronLeft, ChevronRight, Sparkles, CheckCircle2, XCircle } from 'lucide-react';
 
 interface Vote {
   tipo_voto: 'NOVO_EU' | 'VELHO_EU';
@@ -434,14 +434,14 @@ export default function Home() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-[#f5f5f7]">
-        <div className="glass-panel p-8 rounded-3xl w-full max-w-md text-center shadow-2xl border border-white/10 space-y-6">
-          <div className="inline-flex p-3 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
-            <Sparkles className="text-sky-400 w-8 h-8 animate-pulse" />
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 text-stone-800">
+        <div className="glass-panel p-6 sm:p-8 rounded-3xl w-full max-w-sm text-center shadow-xl border border-amber-900/10 space-y-6">
+          <div className="inline-flex p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 shadow-xs">
+            <Flame className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-white">IDTT</h2>
-            <p className="text-xs text-white/50 tracking-wider uppercase font-medium mt-1">Liquid Identity System</p>
+            <h2 className="text-2xl font-bold tracking-tight text-stone-900">IDTT</h2>
+            <p className="text-xs text-stone-500 tracking-wider uppercase font-medium mt-0.5">Gestão de Consistência</p>
           </div>
           <form onSubmit={async (e) => {
             e.preventDefault();
@@ -453,10 +453,10 @@ export default function Home() {
               await supabase.auth.signUp({ email, password });
               alert("Perfil criado! Faça login para ativar.");
             }
-          }} className="space-y-4 text-left">
-            <input name="email" type="email" required placeholder="Email" className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400/50 backdrop-blur-md transition" />
-            <input name="password" type="password" required placeholder="Palavra-passe" className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400/50 backdrop-blur-md transition" />
-            <button type="submit" className="w-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 hover:opacity-95 text-white font-semibold py-3.5 rounded-2xl text-sm tracking-wide shadow-lg shadow-sky-500/25 transition active:scale-[0.98]">
+          }} className="space-y-3.5 text-left">
+            <input name="email" type="email" required placeholder="Email" className="w-full bg-white/80 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition" />
+            <input name="password" type="password" required placeholder="Palavra-passe" className="w-full bg-white/80 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition" />
+            <button type="submit" className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-medium py-3 rounded-xl text-sm shadow-md shadow-amber-900/15 transition active:scale-[0.98]">
               Iniciar Sessão
             </button>
           </form>
@@ -466,63 +466,65 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen pb-32 md:p-8 flex flex-col items-center w-full select-none overflow-y-auto">
+    <main className="min-h-screen pb-28 md:pb-12 md:p-6 lg:p-8 flex flex-col items-center w-full select-none overflow-x-hidden">
       
-      {/* 🔮 APPLE GLASS NAVBAR */}
-      <header className="w-full max-w-4xl glass-panel sticky top-3 z-40 p-4 rounded-3xl md:mb-6 flex justify-between items-center mx-auto transition-all shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-400/20 to-purple-500/20 border border-white/15 flex items-center justify-center shadow-inner">
-            <Flame className="w-5 h-5 text-sky-400" />
+      {/* 🌟 NAVBAR APPLE LIGHT GLASS */}
+      <header className="w-full max-w-4xl glass-panel sticky top-2 sm:top-3 z-40 p-3 sm:p-4 rounded-2xl sm:rounded-3xl mb-3 sm:mb-5 flex justify-between items-center mx-auto shadow-sm">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-amber-500/15 border border-amber-600/20 flex items-center justify-center shrink-0">
+            <Flame className="w-5 h-5 text-amber-700" />
           </div>
-          <div>
-            <span className="font-bold text-lg tracking-tight text-white block leading-none">IDTT</span>
-            <span className="text-[11px] text-white/50 tracking-wider">LIFESTYLE ENGINE</span>
+          <div className="min-w-0">
+            <span className="font-bold text-base sm:text-lg tracking-tight text-stone-900 block leading-tight truncate">IDTT</span>
+            <span className="text-[10px] sm:text-[11px] text-stone-500 font-medium tracking-wide truncate block">Consistência Diária</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <span className="hidden sm:inline-block text-xs bg-white/5 border border-white/10 text-white/70 px-3 py-1.5 rounded-full font-medium">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <span className="hidden sm:inline-block text-xs bg-stone-100/80 border border-stone-200 text-stone-600 px-3 py-1.5 rounded-full font-medium max-w-[130px] truncate">
             {user.email?.split('@')[0]}
           </span>
           <button 
             onClick={carregarEstruturaCompleta} 
-            className={`p-2 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 active:scale-95 transition ${isRefreshing ? 'animate-spin' : ''}`}
+            className={`p-2 rounded-xl bg-white/70 border border-stone-200 text-stone-600 hover:bg-white active:scale-95 transition ${isRefreshing ? 'animate-spin' : ''}`}
+            title="Recarregar"
           >
-            <RotateCcw size={15} className="text-white/80" />
+            <RotateCcw size={15} />
           </button>
           <button 
             onClick={() => supabase.auth.signOut()} 
-            className="text-xs text-rose-400/90 font-medium px-3 py-1.5 rounded-2xl hover:bg-rose-500/10 transition"
+            className="text-xs text-rose-600 font-medium px-2.5 py-1.5 rounded-xl hover:bg-rose-50 transition"
           >
             Sair
           </button>
         </div>
       </header>
 
-      {/* 🧭 SELETOR DE DATA DINÂMICO (FLOATING GLASS PILL) */}
-      <section className="w-full max-w-4xl px-3 md:px-0 mb-6">
-        <div className="glass-panel p-3.5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-lg">
-          <div className="flex items-center justify-between md:justify-start gap-2">
+      {/* 🧭 SELETOR DE DATA ULTRA RESPONSIVO */}
+      <section className="w-full max-w-4xl px-3 sm:px-0 mb-4 sm:mb-6">
+        <div className="glass-panel p-3 sm:p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 min-w-0">
             <button 
               onClick={() => mudarDia(-1)} 
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 active:scale-95 transition"
+              className="p-2 rounded-xl bg-white/80 border border-stone-200 text-stone-700 hover:bg-white active:scale-95 transition shrink-0"
+              title="Dia Anterior"
             >
               <ChevronLeft size={16} />
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
               <input 
                 type="date" 
                 value={dataSelecionada} 
                 onChange={(e) => setDataSelecionada(e.target.value)} 
-                className="bg-white/5 border border-white/10 text-xs font-medium text-white px-3 py-1.5 rounded-xl focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="bg-white/80 border border-stone-200 text-xs font-semibold text-stone-800 px-2.5 py-1.5 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 shrink-0"
               />
               <button 
                 onClick={() => setDataSelecionada(dataHojeReal)}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-xl border transition ${
+                className={`text-xs font-semibold px-2.5 py-1.5 rounded-xl border transition shrink-0 ${
                   isHoje 
-                    ? 'bg-white text-black border-white shadow-md' 
-                    : 'bg-white/5 text-white/60 border-white/10 hover:text-white'
+                    ? 'bg-amber-700 text-white border-amber-700 shadow-xs' 
+                    : 'bg-white/70 text-stone-600 border-stone-200 hover:bg-white'
                 }`}
               >
                 Hoje
@@ -531,54 +533,55 @@ export default function Home() {
 
             <button 
               onClick={() => mudarDia(1)} 
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 active:scale-95 transition"
+              className="p-2 rounded-xl bg-white/80 border border-stone-200 text-stone-700 hover:bg-white active:scale-95 transition shrink-0"
+              title="Dia Seguinte"
             >
               <ChevronRight size={16} />
             </button>
           </div>
 
-          <div className="text-left md:text-right">
-            <span className="text-sm font-semibold text-white tracking-tight block">
-              {NOMES_DIAS_EXTENSO[diaSemanaSelecionado]}
-            </span>
-            <span className="text-xs text-white/50">
-              {dataSelecionada} {!isHoje && <span className="text-amber-400/90 font-medium">• Histórico</span>}
-            </span>
+          <div className="flex items-center justify-between sm:justify-end gap-2 border-t sm:border-t-0 pt-2 sm:pt-0 border-stone-200/50">
+            <div className="text-left sm:text-right min-w-0">
+              <span className="text-xs sm:text-sm font-bold text-stone-900 block truncate">
+                {NOMES_DIAS_EXTENSO[diaSemanaSelecionado]}
+              </span>
+              <span className="text-[11px] text-stone-500 font-medium block">
+                {dataSelecionada} {!isHoje && <span className="text-amber-700 font-semibold">• Histórico</span>}
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 📱 PAINEL GRID */}
-      <div className="w-full max-w-4xl px-3 md:px-0 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      {/* 📱 GRID PRINCIPAL */}
+      <div className="w-full max-w-4xl px-3 sm:px-0 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-start">
         
-        {/* COLUNA 1 & 2: TIMELINE & FACETAS */}
-        <div className={`${tabMobileAtiva === 'painel' ? 'block' : 'hidden md:block'} space-y-6 md:col-span-2`}>
+        {/* COLUNA PRINCIPAL: TIMELINE & FACETAS */}
+        <div className={`${tabMobileAtiva === 'painel' ? 'block' : 'hidden md:block'} space-y-4 sm:space-y-6 md:col-span-2 min-w-0`}>
           
-          {/* ✨ TIMELINE OPERACIONAL / LIQUID GLASS HERO */}
-          <div className="glass-panel p-6 rounded-3xl space-y-5 relative overflow-hidden shadow-2xl">
-            <div className="absolute -top-16 -right-16 w-36 h-36 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
-            
-            <div className="flex justify-between items-center border-b border-white/10 pb-4">
-              <div>
-                <span className="text-[11px] font-semibold text-sky-400 tracking-wider uppercase block">Cronograma de Foco</span>
-                <h3 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-                  <Clock size={20} className="text-sky-400" /> {NOMES_DIAS_EXTENSO[diaSemanaSelecionado]}
+          {/* ✨ TIMELINE DO DIA */}
+          <div className="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl space-y-4 relative overflow-hidden shadow-sm">
+            <div className="flex justify-between items-center border-b border-stone-200/70 pb-3 gap-2">
+              <div className="min-w-0">
+                <span className="text-[10px] sm:text-[11px] font-bold text-amber-700 tracking-wider uppercase block truncate">Tarefas Programadas</span>
+                <h3 className="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 truncate">
+                  <Clock size={18} className="text-amber-600 shrink-0" /> {NOMES_DIAS_EXTENSO[diaSemanaSelecionado]}
                 </h3>
               </div>
-              <div className="text-right">
-                <span className="text-[11px] font-medium text-white/50 uppercase tracking-wider block">Conclusão</span>
-                <span className="text-base font-bold text-white">
-                  {totalConcluidasDia} / {timelineDiaSelecionado.length} <span className="text-xs text-white/50">({timelineDiaSelecionado.length > 0 ? Math.round((totalConcluidasDia / timelineDiaSelecionado.length) * 100) : 0}%)</span>
+              <div className="text-right shrink-0">
+                <span className="text-[10px] font-medium text-stone-500 uppercase tracking-wider block">Conclusão</span>
+                <span className="text-sm sm:text-base font-bold text-stone-900">
+                  {totalConcluidasDia}/{timelineDiaSelecionado.length} <span className="text-xs text-stone-500 font-normal">({timelineDiaSelecionado.length > 0 ? Math.round((totalConcluidasDia / timelineDiaSelecionado.length) * 100) : 0}%)</span>
                 </span>
               </div>
             </div>
 
             {timelineDiaSelecionado.length === 0 ? (
-              <div className="py-8 text-center text-xs text-white/40 glass-card rounded-2xl">
-                Sem hábitos agendados para este dia.
+              <div className="py-8 text-center text-xs sm:text-sm text-stone-500 glass-card rounded-2xl border border-stone-200">
+                Nenhum hábito programado para este dia.
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {timelineDiaSelecionado.map((habit) => {
                   const registo = habit.historico_dias[dataSelecionada];
                   const horarioExibicao = habit.horarios_notificacao.length > 0 ? habit.horarios_notificacao[0] : '--:--';
@@ -592,60 +595,60 @@ export default function Home() {
                   return (
                     <div 
                       key={habit.id} 
-                      className={`p-4 rounded-2xl border transition-all duration-300 ${
+                      className={`p-3 sm:p-3.5 rounded-2xl border transition-all ${
                         isConcluido 
-                          ? 'bg-gradient-to-r from-white/[0.08] to-emerald-500/[0.08] border-emerald-500/30' 
+                          ? 'bg-emerald-50/70 border-emerald-300/80 shadow-2xs' 
                           : isFalha 
-                          ? 'bg-rose-500/[0.08] border-rose-500/30' 
-                          : 'glass-card border-white/10 hover:border-white/20'
+                          ? 'bg-rose-50/70 border-rose-300/80' 
+                          : 'glass-card border-stone-200 hover:border-amber-500/30'
                       }`}
                     >
-                      <div className="flex justify-between items-center mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-white/10 border border-white/10 text-white shadow-xs">
+                      <div className="flex items-center justify-between gap-2 mb-2.5">
+                        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 shrink-0 font-mono">
                             {horarioExibicao}
                           </span>
-                          <div>
-                            <span className="text-[10px] text-white/50 uppercase font-semibold tracking-wider block">
+                          <div className="min-w-0">
+                            <span className="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block truncate">
                               {habit.nome_identidade}
                             </span>
-                            <span className={`text-sm font-semibold tracking-tight ${isConcluido ? 'text-white/90 line-through decoration-white/40' : 'text-white'}`}>
+                            <span className={`text-xs sm:text-sm font-semibold block truncate ${isConcluido ? 'text-stone-700 line-through decoration-stone-400' : 'text-stone-900'}`}>
                               {habit.nome_habito}
                             </span>
                           </div>
                         </div>
 
-                        <div>
+                        <div className="shrink-0">
                           {isConcluido && (
-                            <span className="text-[11px] font-semibold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full shadow-xs">
-                              Novo Eu ✓
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                              <Check size={12} /> Concluído
                             </span>
                           )}
                           {isFalha && (
-                            <span className="text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 px-3 py-1 rounded-full shadow-xs">
-                              Velho Eu ✕
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-rose-100 text-rose-800 border border-rose-200 px-2.5 py-0.5 rounded-full">
+                              <X size={12} /> Falha
                             </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Controlos de Voto / Progresso */}
+                      {/* Controlos de Voto */}
                       {habit.e_cumulativo ? (
-                        <div className="flex items-center justify-between gap-3 bg-black/20 p-2.5 rounded-xl border border-white/5">
-                          <span className="text-xs text-white/70 font-medium">
+                        <div className="flex items-center justify-between gap-2 bg-stone-100/70 p-2 rounded-xl border border-stone-200">
+                          <span className="text-xs font-semibold text-stone-700 truncate">
                             {valorAtual} / {habit.meta_objetivo} {habit.unidade_medida}
                           </span>
-                          <div className="flex gap-2">
+                          <div className="flex gap-1.5 shrink-0">
                             <button 
                               onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtual, -dosePorHora)} 
-                              className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold transition active:scale-95"
+                              className="px-2.5 py-1 bg-white hover:bg-stone-50 border border-stone-200 rounded-lg text-xs font-bold transition active:scale-95"
                             >
                               -
                             </button>
                             <button 
                               onClick={() => handleAlterarProgressoCumulativo(habit.id, valorAtual, dosePorHora)} 
-                              className={`px-3 py-1 rounded-lg text-xs font-semibold shadow-xs transition active:scale-95 ${
-                                isConcluido ? 'bg-white text-black' : 'bg-gradient-to-r from-sky-400 to-blue-500 text-white'
+                              className={`px-2.5 py-1 rounded-lg text-xs font-semibold shadow-xs transition active:scale-95 ${
+                                isConcluido ? 'bg-emerald-700 text-white' : 'bg-amber-600 hover:bg-amber-700 text-white'
                               }`}
                             >
                               +{dosePorHora}{habit.unidade_medida}
@@ -653,26 +656,28 @@ export default function Home() {
                           </div>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 gap-2.5">
+                        <div className="grid grid-cols-2 gap-2">
                           <button 
                             onClick={() => handleToggleVoto(habit.id, 'NOVO_EU')}
-                            className={`text-xs py-2 rounded-xl font-medium tracking-wide transition border active:scale-95 ${
+                            className={`text-xs py-1.5 rounded-xl font-medium transition flex items-center justify-center gap-1.5 border active:scale-95 ${
                               registo?.tipo_voto === 'NOVO_EU' 
-                                ? 'bg-white text-black border-white font-semibold shadow-lg shadow-white/10' 
-                                : 'bg-white/5 text-white/80 border-white/10 hover:bg-white/10'
+                                ? 'bg-amber-700 text-white border-amber-700 font-semibold shadow-xs' 
+                                : 'bg-white/80 text-stone-700 border-stone-200 hover:bg-stone-100'
                             }`}
                           >
-                            👍 Novo Eu
+                            <Check size={14} className={registo?.tipo_voto === 'NOVO_EU' ? 'text-white' : 'text-emerald-600'} /> 
+                            <span>Cumprido</span>
                           </button>
                           <button 
                             onClick={() => handleToggleVoto(habit.id, 'VELHO_EU')}
-                            className={`text-xs py-2 rounded-xl font-medium tracking-wide transition border active:scale-95 ${
+                            className={`text-xs py-1.5 rounded-xl font-medium transition flex items-center justify-center gap-1.5 border active:scale-95 ${
                               registo?.tipo_voto === 'VELHO_EU' 
-                                ? 'bg-rose-500 text-white border-rose-500 font-semibold shadow-lg shadow-rose-500/20' 
-                                : 'bg-white/5 text-rose-300/80 border-white/10 hover:bg-rose-500/10'
+                                ? 'bg-rose-600 text-white border-rose-600 font-semibold shadow-xs' 
+                                : 'bg-white/80 text-stone-700 border-stone-200 hover:bg-stone-100'
                             }`}
                           >
-                            👎 Velho Eu
+                            <X size={14} className={registo?.tipo_voto === 'VELHO_EU' ? 'text-white' : 'text-rose-500'} /> 
+                            <span>Omitido</span>
                           </button>
                         </div>
                       )}
@@ -689,46 +694,45 @@ export default function Home() {
             const eficDia = calcularEficaciaDia(faceta.habits, dataSelecionada);
 
             return (
-              <div key={faceta.id} className="glass-panel p-6 rounded-3xl space-y-4 shadow-xl border border-white/10">
-                <div className="flex justify-between items-start border-b border-white/10 pb-3">
-                  <div>
-                    <span className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider block">Faceta Ativa</span>
-                    <h3 className="text-xl font-bold text-white tracking-tight">{faceta.nome_identidade}</h3>
+              <div key={faceta.id} className="glass-panel p-4 sm:p-5 rounded-2xl sm:rounded-3xl space-y-3.5 shadow-xs">
+                <div className="flex justify-between items-start border-b border-stone-200/70 pb-2.5 gap-2">
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">Área de Identidade</span>
+                    <h3 className="text-base sm:text-lg font-bold text-stone-900 truncate">{faceta.nome_identidade}</h3>
                   </div>
-                  <div className="text-right">
-                    <span className="text-[10px] font-medium text-white/50 uppercase tracking-wider block">Cristalização (90d)</span>
-                    <span className="text-2xl font-bold text-white">{pctCristalizacao}%</span>
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] font-medium text-stone-500 uppercase tracking-wider block">Consistência 90d</span>
+                    <span className="text-xl sm:text-2xl font-bold text-amber-800">{pctCristalizacao}%</span>
                   </div>
                 </div>
 
-                {/* Apple Progress Bar */}
-                <div className="w-full bg-white/5 h-2.5 rounded-full overflow-hidden border border-white/10 p-0.5">
+                <div className="w-full bg-stone-100 h-2 sm:h-2.5 rounded-full overflow-hidden border border-stone-200">
                   <div 
-                    className="bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 h-full rounded-full transition-all duration-700" 
+                    className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 h-full rounded-full transition-all duration-700" 
                     style={{ width: `${pctCristalizacao}%` }} 
                   />
                 </div>
-                <div className="text-xs text-white/50 flex justify-between">
-                  <span>Consistência a 90 dias</span>
-                  <span>Eficácia no Dia: <b className="text-white">{eficDia}%</b></span>
+                <div className="text-xs text-stone-500 flex justify-between font-medium">
+                  <span>Ciclo Contínuo</span>
+                  <span>Eficácia no Dia: <b className="text-stone-800 font-semibold">{eficDia}%</b></span>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* COLUNA 3: MÉTRICAS & CONFIGURAÇÕES */}
-        <div className="space-y-6 md:col-span-1 w-full">
+        {/* COLUNA LATERAL: MÉTRICAS & CONFIGURAÇÕES */}
+        <div className="space-y-4 sm:space-y-6 md:col-span-1 w-full min-w-0">
           
           {/* SEPARADOR 2: MÉTRICAS & CALENDÁRIO */}
-          <div className={`${tabMobileAtiva === 'metricas' ? 'block' : 'hidden md:block'} space-y-6`}>
+          <div className={`${tabMobileAtiva === 'metricas' ? 'block' : 'hidden md:block'} space-y-4 sm:space-y-6`}>
             
-            {/* Calendário iOS */}
-            <div className="glass-panel p-5 rounded-3xl space-y-4 shadow-xl">
-              <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wider flex items-center gap-2">
-                <CalendarIcon size={15} className="text-sky-400" /> Calendário Combinado
+            {/* Calendário */}
+            <div className="glass-panel p-4 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs">
+              <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                <CalendarIcon size={15} className="text-amber-700" /> Calendário Combinado
               </h4>
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
                 {gerarDiasCalendario().map((dia, idx) => {
                   const dateStr = dia.toISOString().split('T')[0];
                   let soma = 0, count = 0;
@@ -745,14 +749,14 @@ export default function Home() {
                     <button 
                       key={idx} 
                       onClick={() => setDataSelecionada(dateStr)}
-                      className={`aspect-square rounded-xl text-xs font-medium transition-all ${
-                        isSel ? 'ring-2 ring-sky-400 font-bold' : ''
+                      className={`aspect-square rounded-xl text-xs font-semibold transition-all ${
+                        isSel ? 'ring-2 ring-amber-600 font-bold bg-amber-50' : ''
                       } ${
                         diaVerde 
-                          ? 'bg-emerald-400/20 text-emerald-300 border border-emerald-400/30' 
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
                           : diaVermelho 
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' 
-                          : 'bg-white/5 text-white/40 border border-white/5 hover:bg-white/10'
+                          ? 'bg-rose-100 text-rose-800 border border-rose-300' 
+                          : 'bg-white/80 text-stone-500 border border-stone-200 hover:bg-white'
                       }`}
                     >
                       {dia.getDate()}
@@ -762,49 +766,49 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Performance Analytics */}
+            {/* Performance */}
             {identities.length > 0 && (
-              <div className="glass-panel p-5 rounded-3xl space-y-4 shadow-xl">
-                <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <h4 className="text-xs font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-                    <BarChart3 size={15} className="text-purple-400" /> Performance
+              <div className="glass-panel p-4 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs">
+                <div className="flex justify-between items-center border-b border-stone-200/70 pb-2">
+                  <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <BarChart3 size={15} className="text-amber-700" /> Rendimento
                   </h4>
-                  <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                    <button onClick={() => setTipoGrafico('barra')} className={`p-1.5 rounded-lg ${tipoGrafico === 'barra' ? 'bg-white text-black' : 'text-white/50'}`}><BarChart3 size={13}/></button>
-                    <button onClick={() => setTipoGrafico('redondo')} className={`p-1.5 rounded-lg ${tipoGrafico === 'redondo' ? 'bg-white text-black' : 'text-white/50'}`}><PieChart size={13}/></button>
+                  <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200">
+                    <button onClick={() => setTipoGrafico('barra')} className={`p-1 rounded-md ${tipoGrafico === 'barra' ? 'bg-white text-stone-900 shadow-2xs font-bold' : 'text-stone-500'}`}><BarChart3 size={13}/></button>
+                    <button onClick={() => setTipoGrafico('redondo')} className={`p-1 rounded-md ${tipoGrafico === 'redondo' ? 'bg-white text-stone-900 shadow-2xs font-bold' : 'text-stone-500'}`}><PieChart size={13}/></button>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <select 
                     value={facetaSelecionadaGrafico || ''} 
                     onChange={(e) => setFacetaSelecionadaGrafico(e.target.value)} 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none"
+                    className="w-full bg-white border border-stone-200 rounded-xl p-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
                   >
-                    {identities.map(i => <option key={i.id} value={i.id} className="bg-[#0b0f19]">{i.nome_identidade}</option>)}
+                    {identities.map(i => <option key={i.id} value={i.id}>{i.nome_identidade}</option>)}
                   </select>
                   
-                  <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 text-[11px] font-medium">
+                  <div className="flex bg-stone-100 p-0.5 rounded-xl border border-stone-200 text-[11px] font-medium">
                     {(['semana', 'mes', 'ano'] as const).map(f => (
-                      <button key={f} onClick={() => setFiltroTempo(f)} className={`flex-1 py-1 rounded-lg capitalize ${filtroTempo === f ? 'bg-white text-black font-semibold' : 'text-white/50'}`}>
+                      <button key={f} onClick={() => setFiltroTempo(f)} className={`flex-1 py-1 rounded-lg capitalize transition ${filtroTempo === f ? 'bg-white text-stone-900 font-bold shadow-2xs' : 'text-stone-500'}`}>
                         {f}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="p-4 glass-card rounded-2xl flex flex-col items-center justify-center">
-                  <span className="text-[10px] text-white/50 uppercase tracking-wider">Aproveitamento</span>
-                  <span className="text-3xl font-bold text-white my-1">{analiseGrafica.mediaGeral}%</span>
-                  <div className="w-full space-y-2 mt-2">
+                <div className="p-3.5 glass-card rounded-2xl flex flex-col items-center justify-center border border-stone-200">
+                  <span className="text-[10px] text-stone-500 uppercase font-semibold">Média do Período</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-amber-800 my-0.5">{analiseGrafica.mediaGeral}%</span>
+                  <div className="w-full space-y-1.5 mt-2">
                     {analiseGrafica.dadosHabitos.map((dh, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex justify-between text-[11px] text-white/70">
-                          <span className="truncate max-w-[130px]">{dh.nome}</span>
-                          <span className="font-semibold text-white">{dh.percentagem}%</span>
+                      <div key={idx} className="space-y-0.5">
+                        <div className="flex justify-between text-[11px] text-stone-600">
+                          <span className="truncate max-w-[130px] font-medium">{dh.nome}</span>
+                          <span className="font-bold text-stone-900">{dh.percentagem}%</span>
                         </div>
-                        <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                          <div className="bg-sky-400 h-full rounded-full transition-all" style={{ width: `${dh.percentagem}%` }} />
+                        <div className="w-full bg-stone-100 h-1.5 rounded-full overflow-hidden border border-stone-200">
+                          <div className="bg-amber-600 h-full rounded-full transition-all" style={{ width: `${dh.percentagem}%` }} />
                         </div>
                       </div>
                     ))}
@@ -814,13 +818,13 @@ export default function Home() {
             )}
           </div>
 
-          {/* SEPARADOR 3: CONFIGURAÇÃO / NOVO HÁBITO */}
-          <div className={`${tabMobileAtiva === 'config' ? 'block' : 'hidden md:block'} space-y-6`}>
+          {/* SEPARADOR 3: CONFIGURAÇÃO */}
+          <div className={`${tabMobileAtiva === 'config' ? 'block' : 'hidden md:block'} space-y-4 sm:space-y-6`}>
             
             {/* Criar Área */}
-            <form onSubmit={handleCriarFaceta} className="glass-panel p-5 rounded-3xl space-y-3 shadow-xl">
-              <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wider flex items-center gap-2">
-                <Layers size={14}/> Nova Faceta
+            <form onSubmit={handleCriarFaceta} className="glass-panel p-4 rounded-2xl sm:rounded-3xl space-y-2.5 shadow-xs">
+              <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Layers size={14} className="text-amber-700" /> Nova Área
               </h4>
               <div className="flex gap-2">
                 <input 
@@ -828,9 +832,9 @@ export default function Home() {
                   placeholder="Ex: Atleta, Profissional" 
                   value={novaFacetaNome} 
                   onChange={(e) => setNovaFacetaNome(e.target.value)} 
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none" 
+                  className="flex-1 bg-white border border-stone-200 rounded-xl px-3 py-1.5 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-amber-500" 
                 />
-                <button type="submit" className="bg-white text-black font-semibold px-4 py-2 rounded-xl text-xs hover:opacity-90 transition">
+                <button type="submit" className="bg-amber-700 hover:bg-amber-800 text-white font-semibold px-3 py-1.5 rounded-xl text-xs shadow-2xs transition">
                   Criar
                 </button>
               </div>
@@ -838,17 +842,17 @@ export default function Home() {
 
             {/* Criar Hábito */}
             {identities.length > 0 && (
-              <form onSubmit={handleCriarHabito} className="glass-panel p-5 rounded-3xl space-y-4 shadow-xl">
-                <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wider flex items-center gap-2">
-                  <Plus size={14}/> Configurar Hábito
+              <form onSubmit={handleCriarHabito} className="glass-panel p-4 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs">
+                <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Plus size={14} className="text-amber-700" /> Configurar Hábito
                 </h4>
                 
                 <select 
                   value={idFacetaAtivaParaHabito || ''} 
                   onChange={(e) => setIdFacetaAtivaParaHabito(e.target.value)} 
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none"
+                  className="w-full bg-white border border-stone-200 rounded-xl p-2 text-xs font-medium text-stone-800 focus:outline-none"
                 >
-                  {identities.map(i => <option key={i.id} value={i.id} className="bg-[#0b0f19]">{i.nome_identidade}</option>)}
+                  {identities.map(i => <option key={i.id} value={i.id}>{i.nome_identidade}</option>)}
                 </select>
 
                 <input 
@@ -856,22 +860,22 @@ export default function Home() {
                   placeholder="Nome do Hábito" 
                   value={novoHabitoNome} 
                   onChange={(e) => setNovoHabitoNome(e.target.value)} 
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none" 
+                  className="w-full bg-white border border-stone-200 rounded-xl p-2 text-xs text-stone-900 focus:outline-none" 
                 />
 
-                {/* Dias da Semana Pills */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] text-white/50 uppercase font-medium">Dias Ativos</label>
+                {/* Dias da Semana */}
+                <div className="space-y-1">
+                  <label className="text-[10px] text-stone-500 uppercase font-semibold">Dias Programados</label>
                   <div className="flex justify-between gap-1">
                     {TODOS_OS_DIAS.map(d => (
                       <button
                         key={d}
                         type="button"
                         onClick={() => toggleDiaNovoHabito(d)}
-                        className={`flex-1 py-1.5 text-[11px] font-semibold uppercase rounded-xl transition ${
+                        className={`flex-1 py-1 text-[10px] font-bold uppercase rounded-lg transition ${
                           novoHabitoDias.includes(d) 
-                            ? 'bg-white text-black shadow-sm' 
-                            : 'bg-white/5 text-white/40 border border-white/5'
+                            ? 'bg-amber-700 text-white shadow-2xs' 
+                            : 'bg-stone-100 text-stone-500 border border-stone-200'
                         }`}
                       >
                         {d}
@@ -881,65 +885,65 @@ export default function Home() {
                 </div>
 
                 {/* Alertas */}
-                <div className="space-y-2">
-                  <label className="text-[10px] text-white/50 uppercase font-medium">Horário</label>
-                  <div className="flex gap-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] text-stone-500 uppercase font-semibold">Horário de Início</label>
+                  <div className="flex gap-1.5">
                     <input 
                       type="time" 
                       value={alertaHoraTmp} 
                       onChange={(e) => setAlertaHoraTmp(e.target.value)} 
-                      className="flex-1 bg-white/5 border border-white/10 rounded-xl p-2 text-xs text-white text-center focus:outline-none" 
+                      className="flex-1 bg-white border border-stone-200 rounded-xl p-1.5 text-xs text-stone-900 text-center focus:outline-none" 
                     />
-                    <button type="button" onClick={adicionarAlertaNaLista} className="bg-white/10 hover:bg-white/20 text-white font-bold px-4 rounded-xl text-xs">+</button>
+                    <button type="button" onClick={adicionarAlertaNaLista} className="bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold px-3 rounded-xl text-xs">+</button>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1">
                     {listaAlertasConfigurados.map((hora) => (
-                      <span key={hora} className="bg-white/10 border border-white/10 text-white text-[11px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                        {hora} <button type="button" onClick={() => removerAlertaDaLista(hora)} className="text-rose-400 font-bold ml-1">×</button>
+                      <span key={hora} className="bg-amber-50 border border-amber-200 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                        {hora} <button type="button" onClick={() => removerAlertaDaLista(hora)} className="text-rose-600 font-bold">×</button>
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex items-center gap-2 pt-0.5">
                   <input 
                     type="checkbox" 
-                    id="e_cum_apple" 
+                    id="e_cum_light" 
                     checked={novoHabitoE_Cumulativo} 
                     onChange={(e) => {
                       setNovoHabitoE_Cumulativo(e.target.checked);
                       if (e.target.checked) { setNovoHabitoMeta(3000); setNovoHabitoUnidade('ml'); }
                       else { setNovoHabitoMeta(1); setNovoHabitoUnidade('un'); }
                     }} 
-                    className="rounded-lg bg-white/5 border-white/10 text-sky-400"
+                    className="rounded bg-white border-stone-300 text-amber-600 focus:ring-amber-500"
                   />
-                  <label htmlFor="e_cum_apple" className="text-xs text-white/70 cursor-pointer select-none">Progresso Cumulativo?</label>
+                  <label htmlFor="e_cum_light" className="text-xs text-stone-700 cursor-pointer select-none font-medium">Progresso Cumulativo?</label>
                 </div>
 
-                <button type="submit" className="w-full bg-gradient-to-r from-sky-400 to-blue-500 text-white font-semibold py-3 rounded-2xl text-xs hover:opacity-95 transition shadow-lg shadow-sky-500/20">
+                <button type="submit" className="w-full bg-amber-700 hover:bg-amber-800 text-white font-semibold py-2.5 rounded-xl text-xs shadow-xs transition active:scale-[0.98]">
                   Guardar Hábito
                 </button>
               </form>
             )}
 
-            {/* Lista de Gestão */}
-            <div className="glass-panel p-5 rounded-3xl space-y-3 shadow-xl">
-              <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wider flex items-center gap-2">
-                <Sliders size={14}/> Estrutura Ativa
+            {/* Gestão */}
+            <div className="glass-panel p-4 rounded-2xl sm:rounded-3xl space-y-2.5 shadow-xs">
+              <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Sliders size={14} className="text-amber-700" /> Estrutura
               </h4>
               {identities.map((idnt) => (
-                <div key={idnt.id} className="glass-card p-3 rounded-2xl space-y-2 border border-white/5">
-                  <div className="flex justify-between items-center border-b border-white/5 pb-1.5">
-                    <span className="text-xs font-semibold text-white">{idnt.nome_identidade}</span>
-                    <button onClick={() => setModalConfirm({ tipo: 'area', id: idnt.id, nome: idnt.nome_identidade })} className="text-white/40 hover:text-rose-400"><Trash2 size={13} /></button>
+                <div key={idnt.id} className="glass-card p-2.5 rounded-xl space-y-1.5 border border-stone-200">
+                  <div className="flex justify-between items-center border-b border-stone-200/60 pb-1">
+                    <span className="text-xs font-bold text-stone-900 truncate">{idnt.nome_identidade}</span>
+                    <button onClick={() => setModalConfirm({ tipo: 'area', id: idnt.id, nome: idnt.nome_identidade })} className="text-stone-400 hover:text-rose-600"><Trash2 size={13} /></button>
                   </div>
                   <div className="space-y-1">
                     {idnt.habits.map((h) => (
-                      <div key={h.id} className="flex justify-between items-center text-xs text-white/70 py-1">
-                        <span className="truncate max-w-[140px]">{h.nome_habito}</span>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => iniciarEdicaoHabito(h)} className="text-white/40 hover:text-sky-400"><Edit3 size={12}/></button>
-                          <button onClick={() => setModalConfirm({ tipo: 'habito', id: h.id, nome: h.nome_habito })} className="text-white/40 hover:text-rose-400"><Trash2 size={12} /></button>
+                      <div key={h.id} className="flex justify-between items-center text-xs text-stone-600 py-0.5">
+                        <span className="truncate max-w-[130px]">{h.nome_habito}</span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button onClick={() => iniciarEdicaoHabito(h)} className="text-stone-400 hover:text-amber-700"><Edit3 size={12}/></button>
+                          <button onClick={() => setModalConfirm({ tipo: 'habito', id: h.id, nome: h.nome_habito })} className="text-stone-400 hover:text-rose-600"><Trash2 size={12} /></button>
                         </div>
                       </div>
                     ))}
@@ -954,64 +958,64 @@ export default function Home() {
 
       </div>
 
-      {/* 🔮 MODAL DE EDIÇÃO APPLE GLASS */}
+      {/* 🔮 MODAL DE EDIÇÃO */}
       {habitoEmEdicao && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-          <form onSubmit={handleSalvarEdicaoHabito} className="glass-panel w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-white/20">
-            <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2"><Edit3 size={15} className="text-sky-400"/> Editar Hábito</h3>
-              <button type="button" onClick={() => setHabitoEmEdicao(null)} className="text-white/40 hover:text-white"><X size={16}/></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xs animate-fade-in">
+          <form onSubmit={handleSalvarEdicaoHabito} className="glass-panel w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-3.5 border border-amber-900/15">
+            <div className="flex justify-between items-center border-b border-stone-200 pb-2">
+              <h3 className="text-sm font-bold text-stone-900 flex items-center gap-1.5"><Edit3 size={15} className="text-amber-700"/> Editar Hábito</h3>
+              <button type="button" onClick={() => setHabitoEmEdicao(null)} className="text-stone-400 hover:text-stone-700"><X size={16}/></button>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] text-white/50 uppercase font-medium">Nome</label>
-              <input type="text" value={editNome} onChange={(e) => setEditNome(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none" />
+              <label className="text-[10px] text-stone-500 uppercase font-semibold">Nome</label>
+              <input type="text" value={editNome} onChange={(e) => setEditNome(e.target.value)} className="w-full bg-white border border-stone-200 rounded-xl p-2 text-xs text-stone-900 focus:outline-none" />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] text-white/50 uppercase font-medium">Dias Ativos</label>
+              <label className="text-[10px] text-stone-500 uppercase font-semibold">Dias de Execução</label>
               <div className="flex justify-between gap-1">
                 {TODOS_OS_DIAS.map(d => (
-                  <button key={d} type="button" onClick={() => toggleDiaEdicao(d)} className={`flex-1 py-1 text-[11px] font-semibold uppercase rounded-xl transition ${editDias.includes(d) ? 'bg-white text-black' : 'bg-white/5 text-white/40'}`}>{d}</button>
+                  <button key={d} type="button" onClick={() => toggleDiaEdicao(d)} className={`flex-1 py-1 text-[10px] font-bold uppercase rounded-lg transition ${editDias.includes(d) ? 'bg-amber-700 text-white' : 'bg-stone-100 text-stone-500'}`}>{d}</button>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <button type="button" onClick={() => setHabitoEmEdicao(null)} className="bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold py-2.5 rounded-xl text-white">Cancelar</button>
-              <button type="submit" className="bg-gradient-to-r from-sky-400 to-blue-500 text-white text-xs font-semibold py-2.5 rounded-xl shadow-md">Gravar</button>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button type="button" onClick={() => setHabitoEmEdicao(null)} className="bg-white border border-stone-200 text-xs font-semibold py-2 rounded-xl text-stone-700">Cancelar</button>
+              <button type="submit" className="bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold py-2 rounded-xl shadow-xs">Gravar</button>
             </div>
           </form>
         </div>
       )}
 
-      {/* MODAL CONFIRMAÇÃO */}
+      {/* MODAL DE CONFIRMAÇÃO */}
       {modalConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl space-y-4 border border-white/20 text-center">
-            <h3 className="text-sm font-bold text-white">Confirmar Remoção</h3>
-            <p className="text-xs text-white/60">Desejas remover <b className="text-white">"{modalConfirm.nome}"</b>?</p>
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <button onClick={() => setModalConfirm(null)} className="bg-white/5 border border-white/10 text-xs font-semibold py-2 rounded-xl text-white">Cancelar</button>
-              <button onClick={ejecutarRemocaoConfirmada} className="bg-rose-500 text-white text-xs font-semibold py-2 rounded-xl shadow-md">Remover</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xs">
+          <div className="glass-panel w-full max-w-xs rounded-3xl p-5 shadow-2xl space-y-3 border border-stone-200 text-center">
+            <h3 className="text-sm font-bold text-stone-900">Confirmar Remoção</h3>
+            <p className="text-xs text-stone-600">Tens a certeza de que desejas expurgar <b className="text-stone-900 font-semibold">"{modalConfirm.nome}"</b>?</p>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button onClick={() => setModalConfirm(null)} className="bg-white border border-stone-200 text-xs font-semibold py-1.5 rounded-xl text-stone-700">Cancelar</button>
+              <button onClick={ejecutarRemocaoConfirmada} className="bg-rose-600 text-white text-xs font-semibold py-1.5 rounded-xl shadow-xs">Remover</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 📱 APPLE FLOATING TAB BAR */}
-      <nav className="fixed bottom-4 left-4 right-4 z-50 md:hidden glass-panel rounded-3xl flex justify-around items-center h-16 px-4 shadow-2xl border border-white/15">
-        <button onClick={() => setTabMobileAtiva('painel')} className={`flex flex-col items-center justify-center transition ${tabMobileAtiva === 'painel' ? 'text-sky-400 font-semibold' : 'text-white/40'}`}>
-          <Flame size={19} />
+      {/* 📱 BARRA DE NAVEGAÇÃO MOBILE */}
+      <nav className="fixed bottom-3 left-3 right-3 z-50 md:hidden glass-panel rounded-2xl flex justify-around items-center h-14 px-3 shadow-lg border border-amber-900/10">
+        <button onClick={() => setTabMobileAtiva('painel')} className={`flex flex-col items-center justify-center transition ${tabMobileAtiva === 'painel' ? 'text-amber-800 font-bold' : 'text-stone-400 font-medium'}`}>
+          <Flame size={18} />
           <span className="text-[10px] mt-0.5">Painel</span>
         </button>
-        <button onClick={() => setTabMobileAtiva('metricas')} className={`flex flex-col items-center justify-center transition ${tabMobileAtiva === 'metricas' ? 'text-sky-400 font-semibold' : 'text-white/40'}`}>
-          <BarChart3 size={19} />
+        <button onClick={() => setTabMobileAtiva('metricas')} className={`flex flex-col items-center justify-center transition ${tabMobileAtiva === 'metricas' ? 'text-amber-800 font-bold' : 'text-stone-400 font-medium'}`}>
+          <BarChart3 size={18} />
           <span className="text-[10px] mt-0.5">Métricas</span>
         </button>
-        <button onClick={() => setTabMobileAtiva('config')} className={`flex flex-col items-center justify-center transition ${tabMobileAtiva === 'config' ? 'text-sky-400 font-semibold' : 'text-white/40'}`}>
-          <Sliders size={19} />
-          <span className="text-[10px] mt-0.5">Config</span>
+        <button onClick={() => setTabMobileAtiva('config')} className={`flex flex-col items-center justify-center transition ${tabMobileAtiva === 'config' ? 'text-amber-800 font-bold' : 'text-stone-400 font-medium'}`}>
+          <Sliders size={18} />
+          <span className="text-[10px] mt-0.5">Definições</span>
         </button>
       </nav>
 
